@@ -3,7 +3,7 @@
 const Sequelize = require('sequelize');
 const path = require('path');
 const config = require('../config');
-const models = [];
+const models = ['report'];
 
 let db = null;
 
@@ -17,9 +17,8 @@ module.exports = function () {
         models.forEach(function (model) {
             db[model] = db.sequelize.import(path.join(
                 config.root,
-                'api',
-                model,
-                model + '.model'
+                'models',
+                model + '.js'
             ));
         });
 
