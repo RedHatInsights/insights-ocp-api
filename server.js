@@ -11,7 +11,7 @@ const app = express();
 app.set('port', config.port);
 
 // routes
-app.post('/report', bodyParser.json(), (req, res) => {
+app.post('/report', bodyParser.json({limit: '50mb'}), (req, res) => {
     try {
         const reportRow = req.body;
         reportRow.createdAt = Date.now();
