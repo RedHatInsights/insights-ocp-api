@@ -11,13 +11,15 @@ const app = express();
 app.set('port', config.port);
 
 // routes
-app.post('/report', bodyParser.json({limit: '50mb'}), (req, res) => {
+app.post('/report/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
     try {
-        const reportRow = req.body;
-        reportRow.createdAt = Date.now();
+        const report = {
+            image_id: req.params.id,
+            report: JSON.stringify(req.body)
+        };
 
         const reportModel = sqldb().report;
-        reportModel.create(reportRow)
+        reportModel.upsert(report)
         .then(result => {
             return res.status(201).send(result);
         }).catch(err => {
@@ -33,18 +35,18 @@ app.get('/report/:id', (req, res) => {
         const reportModel = sqldb().report;
         reportModel.findOne({
             where: {
-                    id: req.params.id
-                }
-            })
-            .then(reports => {
-                if (reports === null) {
-                    reports = {};
-                }
-                res.status(200).send(reports);
-            })
-            .catch(err => {
-                res.status(412).send(err);
-            });
+                id: req.params.id
+            }
+        })
+        .then(reports => {
+            if (reports === null) {
+                reports = {};
+            }
+            res.status(200).send(reports);
+        })
+        .catch(err => {
+            res.status(412).send(err);
+        });
     } catch(err) {
         res.status(412).send(err);
     }
