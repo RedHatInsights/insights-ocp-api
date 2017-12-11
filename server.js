@@ -11,45 +11,54 @@ const app = express();
 app.set('port', config.port);
 
 // routes
-app.post('/report/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
-    try {
-        const report = {
-            image_id: req.params.id,
-            report: JSON.stringify(req.body)
-        };
+app.post('/reports/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
+    const report = {
+        image_id: req.params.id,
+        // hostname: req.system.hostname,
+        report: JSON.stringify(req.body)
+    };
 
-        const reportModel = sqldb().report;
-        reportModel.upsert(report)
-        .then(result => {
-            return res.status(201).send(result);
-        }).catch(err => {
-            return res.status(412).send(err);
-        });
-    } catch (err) {
-        res.status(412).send(err);
-    }
+    const reportModel = sqldb().report;
+    reportModel.upsert(report)
+    .then(result => {
+        return res.status(201).send(result);
+    }).catch(err => {
+        return res.status(412).send(err);
+    });
 });
 
-app.get('/report/:id', (req, res) => {
-    try {
-        const reportModel = sqldb().report;
-        reportModel.findOne({
-            where: {
-                id: req.params.id
-            }
-        })
-        .then(reports => {
-            if (reports === null) {
-                reports = {};
-            }
-            res.status(200).send(reports);
-        })
-        .catch(err => {
-            res.status(412).send(err);
-        });
-    } catch(err) {
+app.get('/reports', (req, res) => {
+    const reportModel = sqldb().report;
+    reportModel.findAll({
+        attributes:['image_id', 'updated_at']
+    })
+    .then(reports => {
+        if (reports === null) {
+            reports = {};
+        }
+        res.status(200).send(reports);
+    })
+    .catch(err => {
         res.status(412).send(err);
-    }
+    });
+});
+
+app.get('/reports/:id', (req, res) => {
+    const reportModel = sqldb().report;
+    reportModel.findOne({
+        where: {
+            id: req.params.id
+        }
+    })
+    .then(reports => {
+        if (reports === null) {
+            reports = {};
+        }
+        res.status(200).send(reports);
+    })
+    .catch(err => {
+        res.status(412).send(err);
+    });
 });
 
 
