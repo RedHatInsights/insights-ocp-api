@@ -12,6 +12,7 @@ app.set('port', config.port);
 
 // routes
 app.post('/reports/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
+    console.log(`Incoming POST for image ID ${req.params.id}...`);
     const report = {
         image_id: req.params.id,
         // hostname: req.system.hostname,
