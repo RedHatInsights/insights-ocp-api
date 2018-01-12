@@ -48,7 +48,7 @@ app.get('/reports/:id', (req, res) => {
     const reportModel = sqldb().report;
     reportModel.findOne({
         where: {
-            id: req.params.id
+            image_id: req.params.id
         }
     })
     .then(reports => {
