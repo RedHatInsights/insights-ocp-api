@@ -2,10 +2,10 @@ const env = process.env;
 const path = require('path');
 
 let dbUri = 'mysql://' +
-    process.env.MARIADB_USERNAME + ':' +
-    process.env.MARIADB_PASSWORD + '@' +
-    process.env.MARIADB_HOST + '/' +
-    process.env.MARIADB_DB;
+    process.env.MYSQL_USER + ':' +
+    process.env.MYSQL_PASSWORD + '@' +
+    process.env.MYSQL_HOST + '/' +
+    process.env.MYSQL_DATABASE;
 
 config = {
     port: 8080,
