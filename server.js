@@ -91,7 +91,7 @@ app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
             if (reports === null) {
                 reports = {};
             }
-            if !( 'created_at' in reports.hasProperty() ){
+            if (!reports.hasOwnProperty('created_at')) {
                 console.log(`Queue added for image ID ${req.params.id}...`));
                 scanQueue.push(req.params.id);
                 return res.status(201).send();
