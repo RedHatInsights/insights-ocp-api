@@ -6,6 +6,7 @@ const sqldb = require('./sqldb');
 const bodyParser = require('body-parser');
 const config = require('./config');
 const app = express();
+const env = process.env;
 const scanQueue = {};
 
 // app config
@@ -72,9 +73,15 @@ app.get('/queue', (req, res) => {
 // Queue an Image ID
 app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
     console.log(`Incoming POST Queue for image ID ${req.params.id}...`);
+    let concurrentScanLimit = process.env.CONCURRENT_SCAN_LIMIT ? parseInt(process.env.CONCURRENT_SCAN_LIMIT) : 2;
 
+    // If there are more than 2 scans going on then send back 403 (continue trying)
+    if ( scanQueue.length >= concurrentScanLimit ){
+        console.log(`Too many concurrent scans, sending timeout to scanner for ${req.params.id}...`);
+        return res.status(403).send();
+        
     // If the Image already exists in the Queue then check when it was queued.
-    if ( req.params.id in scanQueue ){
+    }else if ( req.params.id in scanQueue ){
         let queueTime = new Date(scanQueue[req.params.id].queued);
         let currTime = new Date();
         let queueHoursElapsed = Math.abs(currTime - queueTime) / 36e5;
