@@ -6,7 +6,7 @@ const sqldb = require('./sqldb');
 const bodyParser = require('body-parser');
 const config = require('./config');
 const app = express();
-const scanQueue = [];
+const scanQueue = {};
 
 // app config
 app.set('port', config.port);
@@ -73,10 +73,24 @@ app.get('/queue', (req, res) => {
 app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
     console.log(`Incoming POST Queue for image ID ${req.params.id}...`);
 
-    // If the Image already exists in the Queue then exit.
-    if ( scanQueue.indexOf(req.params.id) != -1 ){
-        console.log(`Queue exists for image ID ${req.params.id}...`);
-        return res.status(423).send();
+    // If the Image already exists in the Queue then check when it was queued.
+    if ( req.params.id in scanQueue ){
+        let queueTime = new Date(scanQueue[req.params.id].queued);
+        let currTime = new Date();
+        let queueHoursElapsed = Math.abs(currTime - queueTime) / 36e5;
+        // If it was not queued within the past 24 hours allow
+        // This fixes edge cases where things were not dequeued properly
+        if ( queueHoursElapsed >= 24 ){
+            console.log(`Queue added for image ID ${req.params.id}...`);
+            scanQueue[req.params.id] = {
+                'image_id' : req.params.id,
+                'queued' : new Date()
+            };
+            return res.status(201).send();
+        }else{
+            console.log(`Queue exists for image ID ${req.params.id}...`);
+            return res.status(423).send();
+        }
 
     // Otherwise check if it has been scanned within the past 24 hours
     }else{
@@ -93,16 +107,22 @@ app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
             }
             if (!reports.hasOwnProperty('created_at')) {
                 console.log(`Queue added for image ID ${req.params.id}...`);
-                scanQueue.push(req.params.id);
+                scanQueue[req.params.id] = {
+                    'image_id' : req.params.id,
+                    'queued' : new Date()
+                };
                 return res.status(201).send();
             }
 
             let reportTime = new Date(reports.created_at);
             let currTime = new Date();
-            let hoursElapsed = Math.abs(date1 - date2) / 36e5;
-            if ( hoursElapsed < 24 ){
+            let reportHoursElapsed = Math.abs(currTime - reportTime) / 36e5;
+            if ( reportHoursElapsed < 24 ){
                 console.log(`Queue added for image ID ${req.params.id}...`);
-                scanQueue.push(req.params.id);
+                scanQueue[req.params.id] = {
+                    'image_id' : req.params.id,
+                    'queued' : new Date()
+                };
                 return res.status(201).send();
             }else{
                 console.log(`Queue not added for image ID ${req.params.id}, scanned within past 24 hours`);
@@ -121,9 +141,9 @@ app.post('/dequeue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
     console.log(`Incoming POST Dequeue for image ID ${req.params.id}...`);
 
     // If the image ID exists in the queue, then remove it
-    if ( scanQueue.indexOf(req.params.id) != -1 ){
+    if ( req.params.id in scanQueue ){
         console.log(`Removing queue for image ID ${req.params.id}...`);
-        scanQueue.splice(scanQueue.indexOf(req.params.id, 1));
+        delete scanQueue[req.params.id];
         return res.status(204).send();
 
     // Otherwise it does not exist, this was an invalid request
