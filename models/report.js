@@ -5,6 +5,12 @@ module.exports = function(sequelize, DataTypes) {
     image_id: {
         primaryKey: true,
         type: DataTypes.STRING
+    },
+    image_name: {
+        type: DataTypes.STRING
+    },
+    skip: {
+        type:DataTypes.BOOLEAN
     }
   }, {
     timestamps: true

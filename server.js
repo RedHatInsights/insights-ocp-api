@@ -18,7 +18,7 @@ app.post('/reports/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
     console.log(`Incoming POST for image ID ${req.params.id}...`);
     const report = {
         image_id: req.params.id,
-        // hostname: req.system.hostname,
+        image_name: req.query.name,
         report: JSON.stringify(req.body)
     };
 
@@ -35,7 +35,7 @@ app.post('/reports/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
 app.get('/reports', (req, res) => {
     const reportModel = sqldb().report;
     reportModel.findAll({
-        attributes:['image_id', 'updated_at']
+        attributes:['image_id', 'image_name', 'updated_at']
     })
     .then(reports => {
         if (reports === null) {
