@@ -81,7 +81,8 @@ app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
     if ( scanStatus["scanning"] == true ){
         let concurrentScanLimit = process.env.CONCURRENT_SCAN_LIMIT ? parseInt(process.env.CONCURRENT_SCAN_LIMIT) : 2;
 
-        // If there are more than 2 scans going on then send back 403 (continue trying)
+        // If there are more than the number of allowed (default of two) scans going on 
+        // then send back 403 (continue trying)
         if ( scanQueue.length >= concurrentScanLimit ){
             console.log(`Too many concurrent scans, sending timeout to scanner for ${req.params.id}...`);
             return res.status(403).send();
