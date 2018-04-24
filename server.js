@@ -181,7 +181,7 @@ app.post('/dequeue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
 });
 
 // Stop all image scans
-app.post('/halt', bodyParser.json({limit: '50mb'}), (req, res) => {
+app.post('/halt', (req, res) => {
     console.log('Incoming request to HALT all scanning.');
     console.log('Any scans currently being performed will finish.');
     console.log('No further scans will be allowed in the queue.');
@@ -193,7 +193,7 @@ app.post('/halt', bodyParser.json({limit: '50mb'}), (req, res) => {
 });
 
 // Resume all image scanning
-app.post('/resume', bodyParser.json({limit: '50mb'}), (req, res) => {
+app.post('/resume', (req, res) => {
     console.log('Incoming request to RESUME all scanning.');
     scanStatus["scanning"] = true;
     scanStatus["updated"] = new Date();
