@@ -120,8 +120,8 @@ app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
                 if (reports === null) {
                     reports = {};
                 }
-                // Check if it actually has a created_at property (actually been scanned)
-                if (!reports.hasOwnProperty('created_at')) {
+                // Check if it actually has a updated_at property (actually been scanned)
+                if (!reports.hasOwnProperty('updated_at')) {
                     console.log(`Queue added for image ID ${req.params.id}...`);
                     scanQueue[req.params.id] = {
                         'image_id' : req.params.id,
@@ -131,7 +131,7 @@ app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
                 }
 
                 // Calculate difference in hours (<24)
-                let reportTime = new Date(reports.created_at);
+                let reportTime = new Date(reports.updated_at);
                 let currTime = new Date();
                 let reportHoursElapsed = Math.abs(currTime - reportTime) / 36e5;
 
