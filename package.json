@@ -1,5 +1,5 @@
 {
-  "name": "insights-bigzam",
+  "name": "insights-ocp-api",
   "version": "1.0.0",
   "description": "Openshift application for viewing Insights scan results.",
   "main": "server.js",
@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/RedhatInsights/insights-bigzam.git"
+    "url": "git+https://github.com/RedhatInsights/insights-ocp-api.git"
   },
   "author": "Jeremy Crafts, Richard Brantley",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/RedhatInsights/insights-bigzam/issues"
+    "url": "https://github.com/RedhatInsights/insights-ocp-api/issues"
   },
-  "homepage": "https://github.com/RedhatInsights/insights-bigzam#readme",
+  "homepage": "https://github.com/RedhatInsights/insights-ocp-api#readme",
   "dependencies": {
     "body-parser": "^1.18.2",
     "express": "^4.16.2",
