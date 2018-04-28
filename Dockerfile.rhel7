@@ -1,0 +1,28 @@
+FROM rhel7:7.5
+
+LABEL \
+     com.redhat.component="insights-ocp-api-container" \
+     name="containers/insights-ocp-api" \
+     version="0.0.1" \
+     summary="API container for Red Hat Insights on Openshift"
+
+ENV NODEJS_VERSION=6 \
+    NPM_CONFIG_PREFIX=$HOME/.npm-global \
+    PATH=$HOME/node_modules/.bin/:$HOME/.npm-global/bin/:$PATH \
+    BASH_ENV=/usr/local/bin/scl_enable \
+    ENV=/usr/local/bin/scl_enable \
+    PROMPT_COMMAND=". /usr/local/bin/scl_enable"
+COPY contrib/bin/scl_enable /usr/local/bin/scl_enable
+
+RUN yum-config-manager --enable rhel-server-rhscl-7-rpms && \
+    yum-config-manager --enable rhel-7-server-optional-rpms && \
+    INSTALL_PKGS="rh-nodejs${NODEJS_VERSION}-nodejs insights-ocp-api" && \
+    yum install -y --setopt=tsflags=nodocs $INSTALL_PKGS && \
+    rpm -V $INSTALL_PKGS && \
+    yum clean all -y
+
+WORKDIR /usr/lib/insights-ocp-api
+
+EXPOSE 8080
+
+CMD ["/bin/bash", "-c", "node server.js"]
