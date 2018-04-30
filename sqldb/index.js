@@ -3,7 +3,7 @@
 const Sequelize = require('sequelize');
 const path = require('path');
 const config = require('../config');
-const models = ['report'];
+const models = ['report', 'status'];
 
 let db = null;
 
