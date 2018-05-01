@@ -8,10 +8,41 @@ const config = require('./config');
 const app = express();
 const env = process.env;
 const scanQueue = {};
-const scanStatus = {'scanning' : true, 'updated': new Date()};
+let scanStatus = {'scanning' : true};
 
 // app config
 app.set('port', config.port);
+
+function init() {
+    sqldb().sequelize.sync()
+    .then(() => {
+        // check whether scanning is running or halted on init
+        return sqldb().status.findById(0);
+    })
+    .then(dbScanStatus => {
+        scanStatus = dbScanStatus ? dbScanStatus : scanStatus;
+        http.createServer(app).listen(app.get('port'), () => {
+            console.log('Insights OCP API listening on port %d...', app.get('port'));
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        process.exit();
+    });
+
+    process.on('SIGINT', () => {
+        process.exit();
+    });
+}
+
+function changeScanStatus(s) {
+    scanStatus.scanning = s;
+    const status = {
+        id: 0,
+        scanning: s
+    }
+    return sqldb().status.upsert(status);
+}
 
 // Post a report
 app.post('/reports/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
@@ -78,7 +109,7 @@ app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
     console.log(`Incoming POST Queue for image ID ${req.params.id}...`);
 
     // Check the current scan status
-    if ( scanStatus["scanning"] == true ){
+    if (scanStatus.scanning) {
         let concurrentScanLimit = process.env.CONCURRENT_SCAN_LIMIT ? parseInt(process.env.CONCURRENT_SCAN_LIMIT) : 2;
 
         // If there are more than the number of allowed (default of two) scans going on 
@@ -188,17 +219,17 @@ app.post('/halt', (req, res) => {
     console.log('No further scans will be allowed in the queue.');
     console.log('The current queue is:');
     console.log(scanQueue);
-    scanStatus["scanning"] = false;
-    scanStatus["updated"] = new Date();
-    return res.status(200).send();
+    changeScanStatus(false)
+    .then(res.status(200).send())
+    .catch(err => res.status(500).send(err));
 });
 
 // Resume all image scanning
 app.post('/resume', (req, res) => {
     console.log('Incoming request to RESUME all scanning.');
-    scanStatus["scanning"] = true;
-    scanStatus["updated"] = new Date();
-    return res.status(200).send();
+    changeScanStatus(true)
+    .then(res.status(200).send())
+    .catch(err => res.status(500).send(err));
 });
 
 // Get current image scanning status
@@ -207,20 +238,5 @@ app.get('/status', (req, res) => {
     return res.status(200).send(scanStatus);
 });
 
-
-// initialize~
-sqldb().sequelize.sync()
-.then(() => {
-    http.createServer(app).listen(app.get('port'), () => {
-        console.log('Big Zam API listening on port %d...', app.get('port'));
-    });
-})
-.catch(err => {
-    console.log(err);
-    process.exit();
-});
-
-process.on('SIGINT', () => {
-    process.exit();
-});
+init();
 
