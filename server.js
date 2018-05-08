@@ -184,7 +184,7 @@ app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
                 console.log(`reportHoursElapsed for ${req.params.id} is ${reportHoursElapsed}`);
 
                 // Only scan it if 24hrs have elapsed
-                if ( reportHoursElapsed < 24 ){
+                if ( reportHoursElapsed >= 24 ){
                     console.log(`Queue added for image ID ${req.params.id}...`);
                     scanQueue[req.params.id] = {
                         'image_id' : req.params.id,
