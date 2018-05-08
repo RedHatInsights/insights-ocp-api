@@ -156,6 +156,8 @@ app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
             .then(reports => {
 
                 console.log(`Found reports for ${req.params.id}: ${reports}`);
+                console.log(reports);
+                console.log(reports.updated_at);
                 if (reports === null) {
                     console.log('Reports was null, setting to {}');
                     reports = {};
