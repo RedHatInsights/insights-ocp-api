@@ -165,6 +165,7 @@ app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
                 // Check if it actually has a updated_at property (actually been scanned)
                 if (!reports.hasOwnProperty('updated_at')) {
                     console.log(`Queue added for image ID ${req.params.id}...`);
+                    console.log('Report retrieved from database does not have property updated_at');
                     scanQueue[req.params.id] = {
                         'image_id' : req.params.id,
                         'queued' : new Date()
