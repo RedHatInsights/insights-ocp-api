@@ -121,8 +121,14 @@ app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
         // If the Image already exists in the Queue then check when it was queued.
         }else if ( req.params.id in scanQueue ){
             let queueTime = new Date(scanQueue[req.params.id].queued);
+            console.log(`queueTime for ${req.params.id} is ${queueTime}`);
+
             let currTime = new Date();
+            console.log(`currTime for ${req.params.id} is ${currTime}`);
+
             let queueHoursElapsed = Math.abs(currTime - queueTime) / 36e5;
+            console.log(`queueHoursElapsed for ${req.params.id} is ${queueHoursElapsed}`);
+
             // If it was not queued within the past 24 hours allow
             // This fixes edge cases where things were not dequeued properly
             if ( queueHoursElapsed >= 24 ){
@@ -148,12 +154,17 @@ app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
                 }
             })
             .then(reports => {
-                if (reports === null) {
+
+                console.log(`Found reports for ${req.params.id}: ${reports}`);
+                console.log(reports);
+                if (reports == null) {
+                    console.log('Reports was null, setting to {}');
                     reports = {};
                 }
                 // Check if it actually has a updated_at property (actually been scanned)
-                if (!reports.hasOwnProperty('updated_at')) {
+                if (!reports.updated_at) {
                     console.log(`Queue added for image ID ${req.params.id}...`);
+                    console.log('Report retrieved from database does not have property updated_at');
                     scanQueue[req.params.id] = {
                         'image_id' : req.params.id,
                         'queued' : new Date()
@@ -163,11 +174,16 @@ app.post('/queue/:id', bodyParser.json({limit: '50mb'}), (req, res) => {
 
                 // Calculate difference in hours (<24)
                 let reportTime = new Date(reports.updated_at);
+                console.log(`reportTime for ${req.params.id} is ${reportTime}`);
+
                 let currTime = new Date();
+                console.log(`currTime for ${req.params.id} is ${currTime}`);
+
                 let reportHoursElapsed = Math.abs(currTime - reportTime) / 36e5;
+                console.log(`reportHoursElapsed for ${req.params.id} is ${reportHoursElapsed}`);
 
                 // Only scan it if 24hrs have elapsed
-                if ( reportHoursElapsed < 24 ){
+                if ( reportHoursElapsed >= 24 ){
                     console.log(`Queue added for image ID ${req.params.id}...`);
                     scanQueue[req.params.id] = {
                         'image_id' : req.params.id,
