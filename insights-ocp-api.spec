@@ -6,7 +6,7 @@
 
 Name:           insights-ocp-api
 Version:        0.0.1
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Insights API for Openshift Container Platform Image scanning
 License:        ASL 2.0
 URL:            https://github.com/redhatinsights/insights-ocp-api
@@ -38,6 +38,9 @@ rm -rf %{buildroot}
 
 
 %changelog
+* Wed May 08 2018 Lindani Phiri <lphiri@redhat.com> - 0.0.1-3
+- Missing soure files
+
 * Tue May 08 2018 Lindani Phiri <lphiri@redhat.com> - 0.0.1-2
 - Address RPM diff issues
 
