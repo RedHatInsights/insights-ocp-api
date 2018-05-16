@@ -1,10 +1,5 @@
 FROM rhel7:7.5
 
-LABEL \
-     com.redhat.component="insights-ocp-api-container" \
-     name="containers/insights-ocp-api" \
-     version="0.0.1" \
-     summary="API container for Red Hat Insights on Openshift"
 
 ENV NODEJS_VERSION=6 \
     NPM_CONFIG_PREFIX=$HOME/.npm-global \
@@ -26,3 +21,16 @@ WORKDIR /opt/insights-ocp-api
 EXPOSE 8080
 
 CMD ["/bin/bash", "-c", "node server.js"]
+
+
+LABEL \
+     com.redhat.component="insights-ocp-api-container" \
+     version="0.0.1" \
+     summary="API container for Red Hat Image Insights on Openshift" \
+     io.k8s.description="The API manages the data store and coordinates Red Hat Insights image scanning on Openshift." \
+     description="The API manages the data store and coordinates Red Hat Insights image scanning on Openshift." \
+     vendor="Red Hat" \
+     name="insights-tech-preview/insights-ocp-api" \
+     io.k8s.display-name="Red Hat Insights Openshift API" \
+     io.openshift.tags="openshift,redhatinsights" \
+     usage="This image is intended for use as part of the Insights Application in Openshift"
